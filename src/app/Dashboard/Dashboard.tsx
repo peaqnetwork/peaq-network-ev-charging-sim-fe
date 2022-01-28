@@ -125,14 +125,6 @@ const Dashboard: React.FunctionComponent = (props) => {
     completeButtonRef.current.disabled = true;
   }, []);
 
-  useEffect(() => {
-    fetch(BEAPI + "/pk")
-      .then((r) => r.text())
-      .then((d) => {
-        setCurrDid("did:peaq:" + d);
-      });
-  }, []);
-
   //init ws
   useEffect(() => {
     if (qpNodeAddress != null) {
@@ -152,6 +144,13 @@ const Dashboard: React.FunctionComponent = (props) => {
 
     socket.on("connect", () => {
       checkBalance();
+
+      //fetch DID
+      fetch(BEAPI + "/pk")
+        .then((r) => r.text())
+        .then((d) => {
+          setCurrDid("did:peaq:" + d);
+        });
     });
 
     return function cleanup() {
@@ -184,7 +183,7 @@ const Dashboard: React.FunctionComponent = (props) => {
                 <QRCode value={currDid} />
               </GridItem>
               <GridItem span={3}>
-              <Button
+                <Button
                   isBlock
                   variant="primary"
                   onClick={() => checkBalance()}
