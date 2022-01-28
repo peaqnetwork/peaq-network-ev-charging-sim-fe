@@ -121,8 +121,13 @@ const Dashboard: React.FunctionComponent = (props) => {
   }
 
   useEffect(() => {
-    errorButtonRef.current.disabled = true;
-    completeButtonRef.current.disabled = true;
+
+    if(errorButtonRef !== null && errorButtonRef.current!==null && errorButtonRef.current != undefined){
+      errorButtonRef.current.disabled = true;
+    }
+    if(completeButtonRef !== null && completeButtonRef.current!==null && completeButtonRef.current != undefined){
+      completeButtonRef.current.disabled = true;
+    }
   }, []);
 
   //init ws
