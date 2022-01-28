@@ -41,10 +41,10 @@ const Dashboard: React.FunctionComponent = (props) => {
   const errorButtonRef = useRef();
   const completeButtonRef = useRef();
 
-  let BEAPI = "http://localhost:25566";
+  let BEAPI = "http://peaq-network-ev-charging-sim-be-jx-devbr.cicd.test.peaq.network:80";
   let search = window.location.search;
   let params = new URLSearchParams(search);
-  let qpNodeAddress = params.get("node");
+  let qpNodeAddress = params.get("backend");
 
   function appendToLog(event, data) {
     let date = new Date();
