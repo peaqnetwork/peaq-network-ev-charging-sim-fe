@@ -1,5 +1,5 @@
 {
-  "name": "EV Charging Simulator FE",
+  "name": "EV_Charging_Simulator_FE",
   "version": "0.0.1",
   "description": "A DApp that works with peaq network to simulate an EV Charging Simulator",
   "repository": "https://github.com/peaqnetwork/peaq-network-ev-charging-sim",
