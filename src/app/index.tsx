@@ -1,16 +1,21 @@
-import * as React from 'react';
-import '@patternfly/react-core/dist/styles/base.css';
-import { BrowserRouter as Router } from 'react-router-dom';
-import { AppLayout } from '@app/AppLayout/AppLayout';
-import { AppRoutes } from '@app/routes';
-import '@app/app.css';
+import * as React from "react";
+import "@patternfly/react-core/dist/styles/base.css";
+import { BrowserRouter as Router } from "react-router-dom";
+import { AppLayout } from "@app/AppLayout/AppLayout";
+import { AppRoutes } from "@app/routes";
+import "@app/app.css";
+import { createStore } from "redux";
+import { Provider } from "react-redux";
+import store from "@app/store/store";
 
 const App: React.FunctionComponent = () => (
-  <Router>
-    <AppLayout>
-      <AppRoutes />
-    </AppLayout>
-  </Router>
+  <Provider store={store}>
+    <Router>
+      <AppLayout>
+        <AppRoutes />
+      </AppLayout>
+    </Router>
+  </Provider>
 );
 
 export default App;

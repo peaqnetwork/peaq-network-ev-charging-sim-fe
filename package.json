@@ -83,11 +83,14 @@
     "@patternfly/react-icons": "^4.13.1",
     "@patternfly/react-log-viewer": "^4.20.4",
     "@patternfly/react-styles": "^4.12.5",
+    "@reduxjs/toolkit": "^1.7.1",
     "@storybook/builder-webpack5": "^6.2.9",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-qr-code": "^2.0.3",
+    "react-redux": "^7.2.6",
     "react-router-last-location": "^2.0.1",
+    "redux": "^4.1.2",
     "sirv-cli": "^1.0.12",
     "socket.io-client": "^4.4.0"
   }
