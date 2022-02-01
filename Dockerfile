@@ -12,3 +12,4 @@ FROM nginx:stable-alpine
 COPY --from=builder /peaq/simulator-frontend/dist /usr/share/nginx/html
 
 EXPOSE 80
+
