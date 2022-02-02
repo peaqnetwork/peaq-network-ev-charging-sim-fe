@@ -41,7 +41,7 @@ const Dashboard: React.FunctionComponent = (props) => {
   const errorButtonRef = useRef();
   const completeButtonRef = useRef();
 
-  let BEAPI = "http://peaq-network-ev-charging-sim-be-jx-devbr.cicd.test.peaq.network:80";
+  let BEAPI = "http://peaq-network-ev-charging-sim-be-jx-devbr.ci.peaq.network";
   let search = window.location.search;
   let params = new URLSearchParams(search);
   let qpNodeAddress = params.get("backend");
