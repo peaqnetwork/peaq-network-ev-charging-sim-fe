@@ -45,6 +45,8 @@ const Dashboard: React.FunctionComponent = (props) => {
   let search = window.location.search;
   let params = new URLSearchParams(search);
   let qpNodeAddress = params.get("backend");
+  let manager = new Manager(BEAPI, { reconnectionDelayMax: 10000 });
+  let socket = useRef(manager.socket("/"));
 
   function appendToLog(event, data) {
     let date = new Date();
@@ -71,7 +73,33 @@ const Dashboard: React.FunctionComponent = (props) => {
       //ignore
     }
 
-    if (event === "log") {
+    if (event === "GetBalanceResponse") {
+        let obj = JSON.parse(data);
+        if (obj.success) {
+          setCurrBalance("" + obj.data);
+          appendToLog("log", "Balance updated.");
+        } else {
+          appendToLog("log", "Failed to update balance");
+        }
+    }
+    else if (event === "GetPKResponse") {
+      let obj = JSON.parse(data);
+      if (obj.success) {
+        appendToLog("log", "PK is successfully acquired");
+        setCurrDid("did:peaq:" + obj.data);
+      } else {
+        appendToLog("log", "Failed to publish DID.");
+      }
+    }
+    else if (event === "PublishDIDResponse") {
+      let obj = JSON.parse(data);
+      if (obj.success) {
+        appendToLog("log", "DID published.");
+      } else {
+        appendToLog("log", "Failed to publish DID.");
+      }
+    }
+    else if (event === "log") {
       setAppLog((currLog) => [...currLog, time + " " + data]);
     } else {
       setSessLog((currLog) => [...currLog, time + " " + data]);
@@ -79,12 +107,20 @@ const Dashboard: React.FunctionComponent = (props) => {
   }
 
   function makeStopChargingRequest(success: boolean) {
-    fetch(BEAPI + "/end_charging", {
-      method: "POST",
-      body: JSON.stringify({
-        success: success,
-      }),
-    });
+    if (qpNodeAddress != null) {
+      BEAPI = qpNodeAddress;
+      manager = new Manager(BEAPI, { reconnectionDelayMax: 10000 });
+      socket.current = manager.socket("/");
+    } else {
+      console.log(
+        "Using default node address as none provided in query parameter [node]"
+      );
+    }
+
+    socket.current.emit('json', JSON.stringify({
+      type : "UserChargingStop",
+      data : success
+    }), function(){});
   }
 
   function stopChargingBySimulatingError() {
@@ -99,25 +135,19 @@ const Dashboard: React.FunctionComponent = (props) => {
 
   function retryPublishingDid() {
     appendToLog("log", "Request to retry publishing DID initiated.");
-
-    fetch(BEAPI + "/publish_did", {
-      method: "POST",
-    })
-      .then((r) => r.json())
-      .then((d) => {
-        appendToLog("log", d);
-      });
+    socket.current.emit('json', JSON.stringify({
+      type : "PublishDID",
+      data : ""
+    }), function(){});
   }
 
   function checkBalance() {
     appendToLog("log", "Checking balance.");
 
-    fetch(BEAPI + "/balance")
-      .then((r) => r.json())
-      .then((d) => {
-        setCurrBalance("" + d.balance);
-        appendToLog("log", "Balance updated.");
-      });
+    socket.current.emit('json', JSON.stringify({
+      type : "GetBalance",
+      data : ""
+    }), function(){});
   }
 
   useEffect(() => {
@@ -140,27 +170,25 @@ const Dashboard: React.FunctionComponent = (props) => {
       );
     }
 
-    let manager = new Manager(BEAPI, { reconnectionDelayMax: 10000 });
-    let socket = manager.socket("/");
+    manager = new Manager(BEAPI, { reconnectionDelayMax: 10000 });
+    socket.current = manager.socket("/");
 
-    socket.onAny((event, data) => {
+    socket.current.onAny((event, data) => {
       appendToLog(event, data);
     });
 
-    socket.on("connect", () => {
+    socket.current.on("connect", () => {
       checkBalance();
 
-      //fetch DID
-      fetch(BEAPI + "/pk")
-        .then((r) => r.text())
-        .then((d) => {
-          setCurrDid("did:peaq:" + d);
-        });
+      socket.current.emit('json', JSON.stringify({
+        type : "GetPK",
+        data : ""
+      }), function(){});
     });
 
     return function cleanup() {
-      if (socket != undefined && socket != null) {
-        socket.disconnect();
+      if (socket.current != undefined && socket.current != null) {
+        socket.current.disconnect();
       } else {
         console.log("Socket was undefined or null");
       }
