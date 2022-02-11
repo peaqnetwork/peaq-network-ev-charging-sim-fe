@@ -99,6 +99,14 @@ const Dashboard: React.FunctionComponent = (props) => {
         appendToLog("log", "Failed to publish DID.");
       }
     }
+    else if (event === "ReconnectResponse") {
+      let obj = JSON.parse(data);
+      if (obj.success) {
+        appendToLog("log", obj.message);
+      } else {
+        appendToLog("log", obj.message);
+      }
+    }
     else if (event === "log") {
       setAppLog((currLog) => [...currLog, time + " " + data]);
     } else {
@@ -137,6 +145,14 @@ const Dashboard: React.FunctionComponent = (props) => {
     appendToLog("log", "Request to retry publishing DID initiated.");
     socket.current.emit('json', JSON.stringify({
       type : "PublishDID",
+      data : ""
+    }), function(){});
+  }
+
+  function reConnect() {
+    appendToLog("log", "Request to reconnect.");
+    socket.current.emit('json', JSON.stringify({
+      type : "Reconnect",
       data : ""
     }), function(){});
   }
@@ -230,6 +246,14 @@ const Dashboard: React.FunctionComponent = (props) => {
                   onClick={() => retryPublishingDid()}
                 >
                   Retry DID publish
+                </Button>{" "}
+                <br />
+                <Button
+                  isBlock
+                  variant="primary"
+                  onClick={() => reConnect()}
+                >
+                  Reconnect to the node
                 </Button>{" "}
                 <br />
                 <Button
