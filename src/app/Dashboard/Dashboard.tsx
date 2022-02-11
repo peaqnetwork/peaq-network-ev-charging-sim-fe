@@ -45,7 +45,7 @@ const Dashboard: React.FunctionComponent = (props) => {
   let search = window.location.search;
   let params = new URLSearchParams(search);
   let qpNodeAddress = params.get("backend");
-  let manager = new Manager(BEAPI, { reconnectionDelayMax: 10000 });
+  let manager = new Manager(BEAPI, { reconnectionDelayMax: 10000, transports: ['websocket', 'polling', 'flashsocket'] });
   let socket = useRef(manager.socket("/"));
 
   function appendToLog(event, data) {
@@ -117,7 +117,7 @@ const Dashboard: React.FunctionComponent = (props) => {
   function makeStopChargingRequest(success: boolean) {
     if (qpNodeAddress != null) {
       BEAPI = qpNodeAddress;
-      manager = new Manager(BEAPI, { reconnectionDelayMax: 10000 });
+      manager = new Manager(BEAPI, { reconnectionDelayMax: 10000, transports: ['websocket', 'polling', 'flashsocket'] });
       socket.current = manager.socket("/");
     } else {
       console.log(
@@ -185,9 +185,6 @@ const Dashboard: React.FunctionComponent = (props) => {
         "Using default node address as none provided in query parameter [node]"
       );
     }
-
-    manager = new Manager(BEAPI, { reconnectionDelayMax: 10000 });
-    socket.current = manager.socket("/");
 
     socket.current.onAny((event, data) => {
       appendToLog(event, data);
