@@ -41,13 +41,8 @@ const Dashboard: React.FunctionComponent = (props) => {
   const errorButtonRef = useRef();
   const completeButtonRef = useRef();
 
-  let BEAPI = "http://peaq-network-ev-charging-sim-be-jx-devbr.ci.peaq.network";
-  let search = window.location.search;
-  let params = new URLSearchParams(search);
-  let qpNodeAddress = params.get("backend");
-  let manager = new Manager(qpNodeAddress || BEAPI,
-      { reconnectionDelayMax: 10000, transports: ['websocket', 'polling', 'flashsocket'] });
-  let socket = useRef(manager.socket("/"));
+  let manager = useRef();
+  let socket = useRef();
 
   function appendToLog(event, data) {
     let date = new Date();
@@ -170,11 +165,23 @@ const Dashboard: React.FunctionComponent = (props) => {
 
   //init ws
   useEffect(() => {
+    const BEAPI = "http://peaq-network-ev-charging-sim-be-jx-devbr.ci.peaq.network";
+    const search = window.location.search;
+    const params = new URLSearchParams(search);
+    const qpNodeAddress = params.get("backend");
+
     if (qpNodeAddress === null) {
       console.log(
         "Using default node address as none provided in query parameter [node]"
       );
     }
+
+    manager.current = new Manager(qpNodeAddress || BEAPI,
+        { reconnectionDelayMax: 10000,
+          transports: ['websocket', 'polling', 'flashsocket'],
+        });
+
+    socket.current = manager.current.socket("/");
 
     socket.current.onAny((event, data) => {
       appendToLog(event, data);
