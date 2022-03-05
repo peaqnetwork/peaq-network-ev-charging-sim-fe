@@ -41,12 +41,8 @@ const Dashboard: React.FunctionComponent = (props) => {
   const errorButtonRef = useRef();
   const completeButtonRef = useRef();
 
-  let BEAPI = "http://peaq-network-ev-charging-sim-be-jx-devbr.ci.peaq.network";
-  let search = window.location.search;
-  let params = new URLSearchParams(search);
-  let qpNodeAddress = params.get("backend");
-  let manager = new Manager(BEAPI, { reconnectionDelayMax: 10000, transports: ['websocket', 'polling', 'flashsocket'] });
-  let socket = useRef(manager.socket("/"));
+  let manager = useRef();
+  let socket = useRef();
 
   function appendToLog(event, data) {
     let date = new Date();
@@ -79,6 +75,7 @@ const Dashboard: React.FunctionComponent = (props) => {
           setCurrBalance("" + obj.data);
           appendToLog("log", "Balance updated.");
         } else {
+          setCurrBalance("failure");
           appendToLog("log", "Failed to update balance");
         }
     }
@@ -91,7 +88,7 @@ const Dashboard: React.FunctionComponent = (props) => {
         appendToLog("log", "Failed to publish DID.");
       }
     }
-    else if (event === "PublishDIDResponse") {
+    else if (event === "RePublishDIDResponse") {
       let obj = JSON.parse(data);
       if (obj.success) {
         appendToLog("log", "DID published.");
@@ -115,16 +112,6 @@ const Dashboard: React.FunctionComponent = (props) => {
   }
 
   function makeStopChargingRequest(success: boolean) {
-    if (qpNodeAddress != null) {
-      BEAPI = qpNodeAddress;
-      manager = new Manager(BEAPI, { reconnectionDelayMax: 10000, transports: ['websocket', 'polling', 'flashsocket'] });
-      socket.current = manager.socket("/");
-    } else {
-      console.log(
-        "Using default node address as none provided in query parameter [node]"
-      );
-    }
-
     socket.current.emit('json', JSON.stringify({
       type : "UserChargingStop",
       data : success
@@ -144,7 +131,7 @@ const Dashboard: React.FunctionComponent = (props) => {
   function retryPublishingDid() {
     appendToLog("log", "Request to retry publishing DID initiated.");
     socket.current.emit('json', JSON.stringify({
-      type : "PublishDID",
+      type : "RePublishDID",
       data : ""
     }), function(){});
   }
@@ -178,13 +165,23 @@ const Dashboard: React.FunctionComponent = (props) => {
 
   //init ws
   useEffect(() => {
-    if (qpNodeAddress != null) {
-      BEAPI = qpNodeAddress;
-    } else {
+    const BEAPI = "http://peaq-network-ev-charging-sim-be-jx-devbr.ci.peaq.network";
+    const search = window.location.search;
+    const params = new URLSearchParams(search);
+    const qpNodeAddress = params.get("backend");
+
+    if (qpNodeAddress === null) {
       console.log(
         "Using default node address as none provided in query parameter [node]"
       );
     }
+
+    manager.current = new Manager(qpNodeAddress || BEAPI,
+        { reconnectionDelayMax: 10000,
+          transports: ['websocket', 'polling', 'flashsocket'],
+        });
+
+    socket.current = manager.current.socket("/");
 
     socket.current.onAny((event, data) => {
       appendToLog(event, data);
