@@ -44,6 +44,23 @@ const Dashboard: React.FunctionComponent = (props) => {
   let manager = useRef();
   let socket = useRef();
 
+  function turnOnStopCharingButton(event, data) {
+      if(event !== "log") {
+      return;
+    }
+    try {
+      let obj = JSON.parse(data);
+      if (JSON.parse(obj.emitShowInfoData.data).state === "charging") {
+        errorButtonRef.current.disabled = false;
+        completeButtonRef.current.disabled = false;
+      } else {
+        errorButtonRef.current.disabled = true;
+        completeButtonRef.current.disabled = true;
+      }
+    } catch (e) {
+      //ignore
+    }
+  }
   function appendToLog(event, data) {
     let date = new Date();
     let time = Intl.DateTimeFormat("en-GB", {
@@ -55,19 +72,6 @@ const Dashboard: React.FunctionComponent = (props) => {
       second: "numeric",
       hour12: false,
     }).format(date);
-
-    try {
-      let obj = JSON.parse(data);
-      if (obj.state === "charging") {
-        errorButtonRef.current.disabled = false;
-        completeButtonRef.current.disabled = false;
-      } else {
-        errorButtonRef.current.disabled = true;
-        completeButtonRef.current.disabled = true;
-      }
-    } catch (e) {
-      //ignore
-    }
 
     if (event === "GetBalanceResponse") {
       let obj = JSON.parse(data);
@@ -195,6 +199,7 @@ const Dashboard: React.FunctionComponent = (props) => {
 
     socket.current.onAny((event, data) => {
       appendToLog(event, data);
+      turnOnStopCharingButton(event, data);
     });
 
     socket.current.on("connect", () => {
