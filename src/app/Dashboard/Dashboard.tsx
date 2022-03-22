@@ -70,27 +70,27 @@ const Dashboard: React.FunctionComponent = (props) => {
     }
 
     if (event === "GetBalanceResponse") {
-        let obj = JSON.parse(data);
-        if (obj.success) {
-          setCurrBalance("" + obj.data);
-          appendToLog("log", "Balance updated.");
-        } else {
-          setCurrBalance("failure");
-          appendToLog("log", "Failed to update balance");
-        }
+      let obj = JSON.parse(data);
+      if (obj.getBalanceAckData.success) {
+        setCurrBalance("" + obj.getBalanceAckData.data);
+        appendToLog("log", "Balance updated.");
+      } else {
+        setCurrBalance("failure");
+        appendToLog("log", "Failed to update balance");
+      }
     }
     else if (event === "GetPKResponse") {
       let obj = JSON.parse(data);
-      if (obj.success) {
+      if (obj.getPkAckData.success) {
         appendToLog("log", "PK is successfully acquired");
-        setCurrDid("did:peaq:" + obj.data);
+        setCurrDid("did:peaq:" + obj.getPkAckData.data);
       } else {
         appendToLog("log", "Failed to publish DID.");
       }
     }
     else if (event === "RePublishDIDResponse") {
       let obj = JSON.parse(data);
-      if (obj.success) {
+      if (obj.republishAckData.success) {
         appendToLog("log", "DID published.");
       } else {
         appendToLog("log", "Failed to publish DID.");
@@ -98,16 +98,26 @@ const Dashboard: React.FunctionComponent = (props) => {
     }
     else if (event === "ReconnectResponse") {
       let obj = JSON.parse(data);
-      if (obj.success) {
-        appendToLog("log", obj.message);
+      if (obj.reconnectAckData.success) {
+        appendToLog("log", obj.reconnectAckData.data);
       } else {
-        appendToLog("log", obj.message);
+        appendToLog("log", obj.reconnectAckData.data);
       }
     }
     else if (event === "log") {
-      setAppLog((currLog) => [...currLog, time + " " + data]);
-    } else {
-      setSessLog((currLog) => [...currLog, time + " " + data]);
+      try {
+        let obj = JSON.parse(data);
+        setAppLog((currLog) => [...currLog, time + " " + obj.emitShowInfoData.data]);
+      } catch (e) {
+        setAppLog((currLog) => [...currLog, time + " " + data]);
+      }
+    }
+    else if (event === "event") {
+      let obj = JSON.parse(data);
+      setSessLog((currLog) => [...currLog, time + " " + obj.emitShowInfoData.data]);
+    }
+    else {
+      setSessLog((currLog) => [...currLog, time + " " + event + ": " + data]);
     }
   }
 
