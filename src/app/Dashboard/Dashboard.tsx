@@ -73,52 +73,56 @@ const Dashboard: React.FunctionComponent = (props) => {
       hour12: false,
     }).format(date);
 
-    if (event === "GetBalanceResponse") {
-      let obj = JSON.parse(data);
+    let obj = null;
+    try {
+      obj = JSON.parse(data);
+    } catch (e) {
+      obj = null;
+    }
+
+    if (obj && obj.eventId === 'GET_BALANCE_ACK') {
       if (obj.getBalanceAckData.success) {
-        setCurrBalance("" + obj.getBalanceAckData.data);
+        setCurrBalance("" + obj.getBalanceAckData.balance);
         appendToLog("log", "Balance updated.");
       } else {
         setCurrBalance("failure");
         appendToLog("log", "Failed to update balance");
       }
     }
-    else if (event === "GetPKResponse") {
-      let obj = JSON.parse(data);
+    else if (obj && obj.eventId === 'GET_PK_ACK') {
       if (obj.getPkAckData.success) {
         appendToLog("log", "PK is successfully acquired");
-        setCurrDid("did:peaq:" + obj.getPkAckData.data);
+        setCurrDid("did:peaq:" + obj.getPkAckData.pk);
       } else {
         appendToLog("log", "Failed to publish DID.");
       }
     }
-    else if (event === "RePublishDIDResponse") {
-      let obj = JSON.parse(data);
-      if (obj.republishAckData.success) {
+    else if (obj && obj.eventId === "REPUBLISH_DID_ACK") {
+      if (!obj.republishAckData.resp || !obj.republishAckData.resp.error) {
         appendToLog("log", "DID published.");
       } else {
         appendToLog("log", "Failed to publish DID.");
       }
     }
-    else if (event === "ReconnectResponse") {
-      let obj = JSON.parse(data);
+    else if (obj && obj.eventId === "RECONNECT_ACK") {
       if (obj.reconnectAckData.success) {
         appendToLog("log", obj.reconnectAckData.data);
       } else {
         appendToLog("log", obj.reconnectAckData.data);
       }
     }
+    // [TODO] Wait for the refinement
     else if (event === "log") {
-      try {
-        let obj = JSON.parse(data);
+      if (obj) {
         setAppLog((currLog) => [...currLog, time + " " + obj.emitShowInfoData.data]);
-      } catch (e) {
+      } else {
         setAppLog((currLog) => [...currLog, time + " " + data]);
       }
     }
     else if (event === "event") {
-      let obj = JSON.parse(data);
-      setSessLog((currLog) => [...currLog, time + " " + obj.emitShowInfoData.data]);
+      if (obj) {
+          setSessLog((currLog) => [...currLog, time + " " + obj.emitShowInfoData.data]);
+      }
     }
     else {
       setSessLog((currLog) => [...currLog, time + " " + event + ": " + data]);
