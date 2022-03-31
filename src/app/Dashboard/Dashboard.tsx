@@ -44,6 +44,23 @@ const Dashboard: React.FunctionComponent = (props) => {
   let manager = useRef();
   let socket = useRef();
 
+  function turnOnStopCharingButton(event, data) {
+      if(event !== "log") {
+      return;
+    }
+    try {
+      let obj = JSON.parse(data);
+      if (JSON.parse(obj.emitShowInfoData.data).state === "charging") {
+        errorButtonRef.current.disabled = false;
+        completeButtonRef.current.disabled = false;
+      } else {
+        errorButtonRef.current.disabled = true;
+        completeButtonRef.current.disabled = true;
+      }
+    } catch (e) {
+      //ignore
+    }
+  }
   function appendToLog(event, data) {
     let date = new Date();
     let time = Intl.DateTimeFormat("en-GB", {
@@ -56,58 +73,59 @@ const Dashboard: React.FunctionComponent = (props) => {
       hour12: false,
     }).format(date);
 
+    let obj = null;
     try {
-      let obj = JSON.parse(data);
-      if (obj.state === "charging") {
-        errorButtonRef.current.disabled = false;
-        completeButtonRef.current.disabled = false;
-      } else {
-        errorButtonRef.current.disabled = true;
-        completeButtonRef.current.disabled = true;
-      }
+      obj = JSON.parse(data);
     } catch (e) {
-      //ignore
+      obj = null;
     }
 
-    if (event === "GetBalanceResponse") {
-        let obj = JSON.parse(data);
-        if (obj.success) {
-          setCurrBalance("" + obj.data);
-          appendToLog("log", "Balance updated.");
-        } else {
-          setCurrBalance("failure");
-          appendToLog("log", "Failed to update balance");
-        }
+    if (obj && obj.eventId === 'GET_BALANCE_ACK') {
+      if (obj.getBalanceAckData.success) {
+        setCurrBalance("" + obj.getBalanceAckData.balance);
+        appendToLog("log", "Balance updated.");
+      } else {
+        setCurrBalance("failure");
+        appendToLog("log", "Failed to update balance");
+      }
     }
-    else if (event === "GetPKResponse") {
-      let obj = JSON.parse(data);
-      if (obj.success) {
+    else if (obj && obj.eventId === 'GET_PK_ACK') {
+      if (obj.getPkAckData.success) {
         appendToLog("log", "PK is successfully acquired");
-        setCurrDid("did:peaq:" + obj.data);
+        setCurrDid("did:peaq:" + obj.getPkAckData.pk);
       } else {
         appendToLog("log", "Failed to publish DID.");
       }
     }
-    else if (event === "RePublishDIDResponse") {
-      let obj = JSON.parse(data);
-      if (obj.success) {
+    else if (obj && obj.eventId === "REPUBLISH_DID_ACK") {
+      if (!obj.republishAckData.resp || !obj.republishAckData.resp.error) {
         appendToLog("log", "DID published.");
       } else {
         appendToLog("log", "Failed to publish DID.");
       }
     }
-    else if (event === "ReconnectResponse") {
-      let obj = JSON.parse(data);
-      if (obj.success) {
-        appendToLog("log", obj.message);
+    else if (obj && obj.eventId === "RECONNECT_ACK") {
+      if (obj.reconnectAckData.success) {
+        appendToLog("log", obj.reconnectAckData.data);
       } else {
-        appendToLog("log", obj.message);
+        appendToLog("log", obj.reconnectAckData.data);
       }
     }
+    // [TODO] Wait for the refinement
     else if (event === "log") {
-      setAppLog((currLog) => [...currLog, time + " " + data]);
-    } else {
-      setSessLog((currLog) => [...currLog, time + " " + data]);
+      if (obj) {
+        setAppLog((currLog) => [...currLog, time + " " + obj.emitShowInfoData.data]);
+      } else {
+        setAppLog((currLog) => [...currLog, time + " " + data]);
+      }
+    }
+    else if (event === "event") {
+      if (obj) {
+          setSessLog((currLog) => [...currLog, time + " " + obj.emitShowInfoData.data]);
+      }
+    }
+    else {
+      setSessLog((currLog) => [...currLog, time + " " + event + ": " + data]);
     }
   }
 
@@ -185,6 +203,7 @@ const Dashboard: React.FunctionComponent = (props) => {
 
     socket.current.onAny((event, data) => {
       appendToLog(event, data);
+      turnOnStopCharingButton(event, data);
     });
 
     socket.current.on("connect", () => {
