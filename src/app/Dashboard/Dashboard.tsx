@@ -81,20 +81,20 @@ const Dashboard: React.FunctionComponent = (props) => {
     }
 
     if (obj && obj.eventId === 'GET_BALANCE_ACK') {
-      if (obj.getBalanceAckData.success) {
+      if (!obj.getBalanceAckData.resp || !obj.getBalanceAckData.resp.error) {
         setCurrBalance("" + obj.getBalanceAckData.balance);
         appendToLog("log", "Balance updated.");
       } else {
         setCurrBalance("failure");
-        appendToLog("log", "Failed to update balance");
+        appendToLog("log", "Failed to update balance " + obj.getBalanceAckData.resp.message);
       }
     }
     else if (obj && obj.eventId === 'GET_PK_ACK') {
-      if (obj.getPkAckData.success) {
+      if (!obj.getPkAckData.resp || !obj.getPkAckData.resp.error) {
         appendToLog("log", "PK is successfully acquired");
         setCurrDid("did:peaq:" + obj.getPkAckData.pk);
       } else {
-        appendToLog("log", "Failed to publish DID.");
+        appendToLog("log", "Failed to publish DID: " + obj.getPkAckData.resp.message);
       }
     }
     else if (obj && obj.eventId === "REPUBLISH_DID_ACK") {
@@ -105,10 +105,10 @@ const Dashboard: React.FunctionComponent = (props) => {
       }
     }
     else if (obj && obj.eventId === "RECONNECT_ACK") {
-      if (obj.reconnectAckData.success) {
-        appendToLog("log", obj.reconnectAckData.data);
+      if (!obj.reconnectAckData.resp || !obj.reconnectAckData.resp.error) {
+        appendToLog("log", obj.reconnectAckData.message);
       } else {
-        appendToLog("log", obj.reconnectAckData.data);
+        appendToLog("log", 'Failed to reconnect: ' + obj.reconnectAckData.resp.message);
       }
     }
     // [TODO] Wait for the refinement
