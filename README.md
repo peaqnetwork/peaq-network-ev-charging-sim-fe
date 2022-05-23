@@ -1,5 +1,7 @@
 ## Quick-start
 
+1. Please check the .env.sample file and setup all the environment variables in your `.env` file.
+2. Execute below commands
 ```bash
 npm install && npm run start:dev
 ```
