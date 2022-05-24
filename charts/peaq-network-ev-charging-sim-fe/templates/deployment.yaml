@@ -45,6 +45,12 @@ spec:
         env:
         - name: VERSION
           value: {{ .Chart.Version }}
+        - name: "REACT_APP_BE_URL"
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Values.simfeSecrets.name }}"
+              key: REACT_APP_BE_URL
+              optional: false
 {{- range $pkey, $pval := .Values.env }}
         - name: {{ $pkey }}
           value: {{ quote $pval }}
