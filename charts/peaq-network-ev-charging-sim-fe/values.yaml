@@ -8,7 +8,8 @@ podAnnotations: {}
 podsLabels: {}
 # Add labels to the deployment
 deploymentLabels: {}
-
+simfeSecrets:
+  name: simulator-fe
 image:
   repository: draft
   tag: dev
