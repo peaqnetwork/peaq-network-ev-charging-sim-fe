@@ -183,11 +183,7 @@ const Dashboard: React.FunctionComponent = (props) => {
 
   //init ws
   useEffect(() => {
-<<<<<<< HEAD
-    const BEAPI = "https://peaq-network-ev-charging-sim-be-jx-devbr.ci.peaq.network";
-=======
     const BEAPI = process.env.REACT_APP_BE_URL || "https://peaq-network-ev-charging-sim-be-jx-devbr.ci.peaq.network";
->>>>>>> feat/1202299830196893_env_variable
     const search = window.location.search;
     const params = new URLSearchParams(search);
     const qpNodeAddress = params.get("backend");
