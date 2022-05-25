@@ -45,7 +45,7 @@ const Dashboard: React.FunctionComponent = (props) => {
   let socket = useRef();
 
   function turnOnStopCharingButton(event, data) {
-      if(event !== "log") {
+    if (event !== "log") {
       return;
     }
     try {
@@ -121,7 +121,7 @@ const Dashboard: React.FunctionComponent = (props) => {
     }
     else if (event === "event") {
       if (obj) {
-          setSessLog((currLog) => [...currLog, time + " " + obj.emitShowInfoData.data]);
+        setSessLog((currLog) => [...currLog, time + " " + obj.emitShowInfoData.data]);
       }
     }
     else {
@@ -131,9 +131,9 @@ const Dashboard: React.FunctionComponent = (props) => {
 
   function makeStopChargingRequest(success: boolean) {
     socket.current.emit('json', JSON.stringify({
-      type : "UserChargingStop",
-      data : success
-    }), function(){});
+      type: "UserChargingStop",
+      data: success
+    }), function () { });
   }
 
   function stopChargingBySimulatingError() {
@@ -149,34 +149,34 @@ const Dashboard: React.FunctionComponent = (props) => {
   function retryPublishingDid() {
     appendToLog("log", "Request to retry publishing DID initiated.");
     socket.current.emit('json', JSON.stringify({
-      type : "RePublishDID",
-      data : ""
-    }), function(){});
+      type: "RePublishDID",
+      data: ""
+    }), function () { });
   }
 
   function reConnect() {
     appendToLog("log", "Request to reconnect.");
     socket.current.emit('json', JSON.stringify({
-      type : "Reconnect",
-      data : ""
-    }), function(){});
+      type: "Reconnect",
+      data: ""
+    }), function () { });
   }
 
   function checkBalance() {
     appendToLog("log", "Checking balance.");
 
     socket.current.emit('json', JSON.stringify({
-      type : "GetBalance",
-      data : ""
-    }), function(){});
+      type: "GetBalance",
+      data: ""
+    }), function () { });
   }
 
   useEffect(() => {
 
-    if(errorButtonRef !== null && errorButtonRef.current!==null && errorButtonRef.current != undefined){
+    if (errorButtonRef !== null && errorButtonRef.current !== null && errorButtonRef.current != undefined) {
       errorButtonRef.current.disabled = true;
     }
-    if(completeButtonRef !== null && completeButtonRef.current!==null && completeButtonRef.current != undefined){
+    if (completeButtonRef !== null && completeButtonRef.current !== null && completeButtonRef.current != undefined) {
       completeButtonRef.current.disabled = true;
     }
   }, []);
@@ -195,9 +195,10 @@ const Dashboard: React.FunctionComponent = (props) => {
     }
 
     manager.current = new Manager(qpNodeAddress || BEAPI,
-        { reconnectionDelayMax: 10000,
-          transports: ['websocket', 'polling', 'flashsocket'],
-        });
+      {
+        reconnectionDelayMax: 10000,
+        transports: ['websocket', 'polling', 'flashsocket'],
+      });
 
     socket.current = manager.current.socket("/");
 
@@ -210,9 +211,9 @@ const Dashboard: React.FunctionComponent = (props) => {
       checkBalance();
 
       socket.current.emit('json', JSON.stringify({
-        type : "GetPK",
-        data : ""
-      }), function(){});
+        type: "GetPK",
+        data: ""
+      }), function () { });
     });
 
     return function cleanup() {
@@ -237,9 +238,10 @@ const Dashboard: React.FunctionComponent = (props) => {
           <PanelMainBody>
             <Grid>
               <GridItem span={6}>
-                DID: [{currDid}]
+                DID: [<span className="did-value">{currDid}</span>]
+
                 <br />
-                Balance: {currBalance}
+                Balance: <span className="balance-value">{currBalance}</span>
               </GridItem>
               <GridItem span={3}>
                 <QRCode value={currDid} />
