@@ -42,6 +42,8 @@ spec:
       - name: {{ .Chart.Name }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
+        #command: ["echo"]
+        args: ["REACT_APP_BE_URL=$(REACT_APP_BE_URL)"]
         env:
         - name: VERSION
           value: {{ .Chart.Version }}
@@ -51,7 +53,7 @@ spec:
               name: "{{ .Values.simfeSecrets.name }}"
               key: REACT_APP_BE_URL
               optional: false
-          args: ["REACT_APP_BE_URL=$(REACT_APP_BE_URL)"]
+          
 {{- range $pkey, $pval := .Values.env }}
         - name: {{ $pkey }}
           value: {{ quote $pval }}
