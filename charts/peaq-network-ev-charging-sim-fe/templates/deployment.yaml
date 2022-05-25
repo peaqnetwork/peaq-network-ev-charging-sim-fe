@@ -51,6 +51,7 @@ spec:
               name: "{{ .Values.simfeSecrets.name }}"
               key: REACT_APP_BE_URL
               optional: false
+          args: ["REACT_APP_BE_URL=$(REACT_APP_BE_URL)"]
 {{- range $pkey, $pval := .Values.env }}
         - name: {{ $pkey }}
           value: {{ quote $pval }}
