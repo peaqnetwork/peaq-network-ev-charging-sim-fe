@@ -1,0 +1,1 @@
+env | grep REACT > .env

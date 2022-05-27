@@ -4,6 +4,7 @@ ADD . /peaq/simulator-frontend
 
 WORKDIR /peaq/simulator-frontend
 
+RUN npm run dumpenv
 RUN npm install 
 RUN npm run build
 

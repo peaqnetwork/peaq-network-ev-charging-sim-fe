@@ -6,6 +6,11 @@
 npm install && npm run start:dev
 ```
 
+## Deploy
+
+In deployment, there might be some enviroment variables.
+So you can execute the `npm run dumpenv` to generate the `.env` file with the React related variables.
+
 ## Change BE URL
 The default of the BE endpoint is `http://peaq-network-ev-charging-sim-be-jx-devbr.ci.peaq.network`.
 However, if we want to change the BE endpoint, we can add `backend=URL` into the current URL.
