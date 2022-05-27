@@ -3,13 +3,8 @@
 1. Please check the .env.sample file and setup all the environment variables in your `.env` file.
 2. Execute below commands
 ```bash
-npm install && npm run start:dev
+npm install && NODE_ENV=development npm run start:dev
 ```
-
-## Deploy
-
-In deployment, there might be some enviroment variables.
-So you can execute the `npm run dumpenv` to generate the `.env` file with the React related variables.
 
 ## Change BE URL
 The default of the BE endpoint is `http://peaq-network-ev-charging-sim-be-jx-devbr.ci.peaq.network`.
