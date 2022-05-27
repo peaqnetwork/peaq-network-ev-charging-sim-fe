@@ -7,7 +7,7 @@
   "license": "Apache2",
   "private": true,
   "scripts": {
-  	"dumpenv": "sh dump.env.sh",
+    "dumpenv": "env | grep REACT > .env",
     "prebuild": "npm run clean",
     "dr:surge": "node dr-surge.js",
     "build": "webpack --config webpack.prod.js && npm run dr:surge",
