@@ -3,7 +3,19 @@
 1. Please check the .env.sample file and setup all the environment variables in your `.env` file.
 2. Execute below commands
 ```bash
-npm install && npm run start:dev
+npm install && NODE_ENV=development npm run start:dev
+```
+3. After docker build, if below errors happen, please set up the `-e NODE=development` when running the docker run command.
+```
+  Provided flags:
+    --config-name = ./runtime-env.js
+    --env-file = ./.env
+
+  Your environment variables will be available on 'window.__RUNTIME_CONFIG__'
+
+./runtime-env.js does not exist. Creating one...
+Error creating ./runtime-env.js: Error: Error getting 'REACT_APP_BE_URL' from process.env
+    at /usr/local/lib/node_modules/runtime-env-cra/lib/index.js:45:13
 ```
 
 ## Change BE URL

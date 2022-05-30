@@ -10,8 +10,8 @@
     "prebuild": "npm run clean",
     "dr:surge": "node dr-surge.js",
     "build": "webpack --config webpack.prod.js && npm run dr:surge",
-    "start": "sirv dist --cors --single --host --port 8080",
-    "start:dev": "webpack serve --color --progress --config webpack.dev.js",
+    "start": "mkdir -p dist && runtime-env-cra --config-name=./dist/runtime-env.js &&  sirv dist --cors --single --host --port 8080",
+    "start:dev": "mkdir -p dist && runtime-env-cra --config-name=./dist/runtime-env.js && webpack serve --color --progress --config webpack.dev.js",
     "test": "jest --watch",
     "test:coverage": "jest --coverage",
     "eslint": "eslint --ext .tsx,.js ./src/",
@@ -91,6 +91,7 @@
     "react-redux": "^7.2.6",
     "react-router-last-location": "^2.0.1",
     "redux": "^4.1.2",
+    "runtime-env-cra": "^0.2.4",
     "sirv-cli": "^1.0.12",
     "socket.io-client": "^4.4.0"
   }
