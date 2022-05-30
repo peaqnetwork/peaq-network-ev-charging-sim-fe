@@ -7,7 +7,6 @@ storybook-static
 .DS_Store
 .idea
 .env
-runtime-env.js
 
 #### vim
 # Swap
