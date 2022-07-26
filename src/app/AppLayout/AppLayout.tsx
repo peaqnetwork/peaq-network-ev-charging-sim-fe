@@ -17,7 +17,8 @@ import {
   PageHeaderToolsItem,
 } from "@patternfly/react-core";
 import { routes, IAppRoute, IAppRouteGroup } from "@app/routes";
-import logo from "@app/bgimages/Patternfly-Logo.svg";
+//import logo from "@app/bgimages/Patternfly-Logo.svg";
+import logo from "@app/bgimages/peaqLogo.svg";
 
 interface IAppLayout {
   children: React.ReactNode;
